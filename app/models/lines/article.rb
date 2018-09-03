@@ -1,9 +1,9 @@
-# {Article}s are the core of the lines blog. 
-# 
+# {Article}s are the core of the lines blog.
+#
 # An {Article} must have on or more {Author}s through {Authorable}.
-# 
-# An article extends FriendlyId to provide meaningful slugs instead of the usual id value. 
-# 
+#
+# An article extends FriendlyId to provide meaningful slugs instead of the usual id value.
+#
 # Slugs are unique and contain the article's title. A incremental numerical value
 # is added to the slug title if the it already exists in the database.
 
@@ -40,7 +40,7 @@ module Lines
     #validate :one_image_selected
 
     # Callbacks
-    after_save :update_used_images, :refresh_sitemap
+    after_save :update_used_images
 
     # Model Scopes
     scope :published, -> { where(published: true).order("featured DESC, published_at DESC, created_at DESC") }
@@ -90,18 +90,8 @@ module Lines
       end
     end
 
-    # Refreshes the sitemap and pings the search engines
-    def refresh_sitemap
-      if self.published
-        if Rails.env == 'production' && ENV["CONFIG_FILE"]
-          SitemapGenerator::Interpreter.run(config_file: ENV["CONFIG_FILE"])
-          SitemapGenerator::Sitemap.ping_search_engines 
-        end
-      end
-    end
-
     # Validates if either a predefined hero image is selected or a custom hero
-    # image uploaded. 
+    # image uploaded.
     def one_image_selected
       if both_images_selected || no_image_selected
         errors[:base] << 'You have to either select an image or upload one.'
